@@ -20,12 +20,19 @@ func main() {
 	}
 
 	app.TemplateCache = template
+	app.UseCache = false
 
-	http.HandleFunc("/", handlers.HomeHandler)
-	http.HandleFunc("/about", handlers.AboutHandler)
+	repo := handlers.NewRepo(&app)
+	handlers.NewHandler(repo)
+
+	render.NewTemplate(&app)
 
 	fmt.Println("Starting port at ", PORT)
-	err = http.ListenAndServe(PORT, nil)
+	serve := &http.Server{
+		Addr:    PORT,
+		Handler: routes(&app),
+	}
+	err = serve.ListenAndServe()
 	if err != nil {
 		fmt.Println("Server crashed", err.Error())
 		return

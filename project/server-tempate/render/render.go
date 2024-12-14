@@ -6,15 +6,27 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+
+	"github.com/SeanThakur/gopl/project/server-tempate/config"
+	"github.com/SeanThakur/gopl/project/server-tempate/models"
 )
 
-func RenderTemplate(response http.ResponseWriter, templatePath string) {
+var app *config.APP_CONFIG
+
+func NewTemplate(temp *config.APP_CONFIG) {
+	app = temp
+}
+
+func RenderTemplate(response http.ResponseWriter, templatePath string, tempData *models.TemplateData) {
+	var templateC map[string]*template.Template
+
 	// create a template cache
-	templateC, err := CreateTemplateCache()
-	if err != nil {
-		fmt.Println("Error encounered while creating template cache", err.Error())
-		return
+	if app.UseCache {
+		templateC = app.TemplateCache
+	} else {
+		templateC, _ = CreateTemplateCache()
 	}
+
 	// get requested template from the cache
 	templateG, ok := templateC[templatePath]
 	if !ok {
@@ -23,7 +35,7 @@ func RenderTemplate(response http.ResponseWriter, templatePath string) {
 	}
 
 	buffer := new(bytes.Buffer)
-	err = templateG.Execute(buffer, nil)
+	err := templateG.Execute(buffer, tempData)
 	if err != nil {
 		fmt.Println("Error encounered while executing template buffer", err.Error())
 		return
