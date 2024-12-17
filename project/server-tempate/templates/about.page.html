@@ -2,5 +2,11 @@
 <div class="container">
   <h1>Welcome to the about us page!!</h1>
   <p>Testing {{index .StringMap "test"}}</p>
+  <p>
+    {{if ne (index .StringMap "remote_ip") ""}} Your remote IP address is
+    {{index .StringMap "remote_ip"}} {{else}} I don't know you IP address yet,
+    please visit this link to set it <a href="/">Click here</a>
+    {{end}}
+  </p>
 </div>
 {{end}}

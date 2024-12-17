@@ -25,12 +25,16 @@ func NewHandler(r *Repository) {
 }
 
 func (Trepo *Repository) HomeHandler(response http.ResponseWriter, request *http.Request) {
+	remoteIP := request.RemoteAddr
+	Trepo.App.Session.Put(request.Context(), "remote_ip", remoteIP)
 	render.RenderTemplate(response, "home.page.html", &models.TemplateData{})
 }
 
 func (Trepo *Repository) AboutHandler(response http.ResponseWriter, request *http.Request) {
+	remoteIP := Trepo.App.Session.GetString(request.Context(), "remote_ip")
 	stringMapData := make(map[string]string)
 	stringMapData["test"] = "data from server to about page"
+	stringMapData["remote_ip"] = remoteIP
 	render.RenderTemplate(response, "about.page.html", &models.TemplateData{
 		StringMap: stringMapData,
 	})
